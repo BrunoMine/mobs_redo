@@ -1,0 +1,236 @@
+Tradução em Portugues do mod mobs_redo
+Revisão da API original: 23/Mai/2016
+Revisão da tradução: 31/Ago/2016
+Tradutor: BrunoMine
+
+A API de mobs é uma função que pode ser chamada por outros mods para adicionar novos mobs como animais ou monstros em minetest.
+
+    configurações do minetest.conf*
+
+    'enable_damage' se true, monstros podem atacar jogadores (por padrão é true)
+    'only_peaceful_mobs' se true, apenas animais podem spawnar em jogo (por padrão é false)
+    'mobs_disable_blood' se false, efeitos de sangue aparecem quando um mob é golpeado (por padrão é false)
+    'mobs_spawn_protected' de definido para 1, mobs não podem spawnar em areas protegidas (por padrão é 0)
+    'remove_far_mobs' se true, mobs fora do alcance do campo visual dos jogadores podem ser removidos (por padrão é false)
+    'mobname_chance' pode alterar as chances de spawn de um mobs especifico ou definir 0 para desativar o spawn ex. mobs_animal:cow_chance = 1000
+
+
+mobs:register_mob(name, definition)
+
+Essa função registra um novo mob em forma de entidade em Minetest
+
+    'name' is the name of the mob (e.g. "mobs:dirt_monster")
+    definition é uma tabela de definições contendo os seguintes campos
+        'type' o tipo do mob ("monster", "animal" ou "npc")
+        'passive' o mob deve se defender, definir false para atacar
+        'docile_by_day' se true, o mob não deve atacar durante as horas de luz do dia exeto quanto provocado
+        'attacks_monsters' usualmente para npc's atacarem monstros na area
+        'group_attack' true para defender um mesmo tipo de mob de ataques na area
+        'hp_min' saude minima
+        'hp_max' saude maxima (saude do mob é selecionada aleatoriamenteentre os dois)
+        'physical' o mesmo é em minetest.register_entity()
+        'collisionbox' o mesmo que em minetest.register_entity()
+        'visual' o mesmo que em minetest.register_entity()
+        'visual_size' o mesmo que em minetest.register_entity()
+        'textures' o mesmo que em minetest.register_entity()
+            embora você pode adicionar várias linhas para texturas aleatórias {{"textura1.png"}, {"textura2.png"}}, 
+        'gotten_texture' textura alterada para quando o valor de self.gotten é definido true (usado para tosquiar de ovelhas)
+        'child_texture' textura do mob para quando o valor de self.child é definido true
+        'mesh' o mesmo que em minetest.register_entity()
+        'gotten_mesh' malha alternativa para quando o valor de self.gotten é true (usado por ovelhas)
+        'makes_footstep_sound' o mesmo é em minetest.register_entity()
+        'follow' item(ns) que, quando mantido em mão, deve fazer o mob seguir o jogador, pode ser uma única string "default:apple" ou tabela de strings {"default:apple", "default:diamond"}
+        'view_range' o alcance em que o monstro deve ver o jogador e persegui-lo
+        'walk_chance' chances de o mob andar ao redor
+        'jump_chance' chances de o mob pular ao redor, definir acima em 0 para o mob apenas pular
+        'walk_velocity' a velocidade em que o monstro anda ao redor
+        'run_velocity' a velocidade do monstro quando estiver atacando um jogador
+        'runaway' se true, o mob deve virar e fugir quando atacado
+        'stepheight' altura mínima do node em que o mob pode andar sem precisar pular (o padrão é 0.6)
+        'jump' o mob pode pular, true ou false
+        'jump_height' altura que um mob pode pular, o padrão é 6
+        'fly' o mob pode voar, true ou false (usado por natação do mob tambem)
+        'fly_in' nome do node no qual o mob pode voar, ex. "air", "default:water_source" para peixes
+        'damage' o dano por segundo
+        'recovery_time' quanto tempo, desde que o mob é golpeado, para recuperar (o padrão é 0.5)
+        'knock_back' força do knock-back quando o mob é golpeado (o padrão é 3)
+        'immune_to' tabela contendo nomes dos itens/ferramentas especiais e dano causado
+            ex. {"default:sword_wood", 0}, {"default:gold_lump", -10} imune a espada de madeira, minerio de ouro cura
+        'blood_amount' numero de particulas de sangue que aparecem quando o mob é golpeado
+        'blood_texture' textura das particulas de sangue (o padrão é "mobs_blood.png")
+        'drops' é uma lista de tabelas contendo os seguintes campos:
+            'name' nome do item ex. default:stone
+            'chance' o intervalo de chance (o mesmo que no abm) para obter o item
+            'min' o numero mínimo de itens
+            'max' o numero máximo de itens
+        'armor' a armadura (integer)(3=menor; 1=maior)(grupo fleshy é usado)
+        'drawtype' "front" ou "side" (OBSOLETO, substituido com o que está logo abaixo)
+        'rotate' define a rotação do mob, 0=frente, 90=lado, 180=trazeira, 270=outro lado
+        'water_damage' dano por segundo se o mob estiver na água
+        'lava_damage' dano por segundo se o mob estiver na lava
+        'light_damage' dano por segundo se o mob estiver na luz
+        'fall_damage' mob deve receber dano quando cair de altura
+        'fall_speed' velocidade da queda do mob (o padrão é -10 e tem que ser menor que -2)
+        'fear_height' distancia do mob e uma queda para então, acima de tudo, ele voltar (o padrão é 0 para desabilitar)
+        'on_die' uma função que é chamado quando o mob morre, os parâmetros são (self, pos)
+        'floats' 1 para flutuar na água, 0 para afundar
+        'on_rightclick' o mesmo que em minetest.register_entity()
+        'pathfinding' definir 1 para o mob usar a funcionalidade pathfinder para localizar jogadores, definir 2 para que possam construir/quebrar também (funciona apenas com ataque de duelo)
+        'attack_type' o tipo de ataque do monstro
+            'dogfight' segue o jogador dentro de uma distância e ataca quando alcança
+            'shoot' dispara flechas definidas quando o jogador estiver dentro de uma distância
+            'explode' segue o jogador dentro de uma distância e então pisca e explode quando alcança
+            'dogshoot' dispara flechas quando o jogador estiver dentro de uma distância e golpeia quando alcança
+	'dogshoot_switch' permite alternar entre os modos shoot e dogfight no ataque dogshoot usando temporizador (1 = shoot, 2 = dogfight)
+	'dogshoot_count_max' numero em segundos entre a troca dos modos acima
+        'custom_attack' é uma função que é chamada quando o mob está no alcance para atacar o jogador, os parametros são (self, to_attack)
+        'double_melee_attack' se false então api deve escolher aleatoriamente entre as animações de ataque 'punch' e 'punch2'
+        'on_blast' é chamado quando uma TNT explode perto do mob, a função usa (object, damage) e retorna (do_damage, do_knockback, drops)
+        'explosion_radius' raio de ataque da explosão (o padrão é 1)
+        'arrow' se attack_type (tipo de ataque) for "shoot" ou "dogshoot" então o nome da entidade da flecha é requerido
+        'shoot_interval' o intervalo mínimo entre os tiros
+        'shoot_offset' valor aproximado da flecha/bola de fogo quando disparado
+        'reach' quão longe o alcance do mob, o padrão é 3
+        'sounds' essa é uma tabela com os sons do mob
+            'random' som aleatorio durante o jogo
+            'war_cry' som de quando inicia um ataque contra um jogador
+            'attack' Som ao atacar um jogador
+            'shoot_attack' som de quando atacar o jogador com uma flecha/entidade
+            'damage' som de quando é atingido
+            'death' som de quando morre
+            'jump' som de quando pula
+            'explode' som de quando explode
+            'distance' distância máxima de onde o som pode ser ouvido (o padrão é 10)
+        'animation' essa é uma tabela com velocidades e intervalos de animação da malha
+            'stand_start' quadro inicial da animação em pé (parado)
+            'stand_end' quadro final da animação em pé (parado)
+            'walk_start' quadro inicial da animação andando
+            'walk_end' quadro final da animação andando
+            'run_start' quadro inicial da animação correndo
+            'run_end' quadro final da animação correndo
+            'punch_start' quadro inicial da animação golpeando
+            'punch_end' quadro final da animação golpeando
+            'punch2_start' quadro inicial da animação alternativa golpeando
+            'punch2_end' quadro final da animação alternativa golpeando
+            'shoot_start' quadro inicial da animação atirando
+            'shoot_end' quadro final da animação atirando
+            'speed_normal' velocidade de animação normal
+            'speed_run' velocidade de animação correndo
+            'speed_punch' velocidade de animação golpeando
+            'speed_punch2' velocidade de animação alternativa golpeando
+            'speed_shoot' velocidade de animação atirando
+        'replace_what' grupo de itens a substituir ex. {"farming:wheat_8", "farming:carrot_8"}
+        'replace_with' item com o qual é substituido (substituir pelo que) ex. "air" ou, no caso das galinhas, "mobs:egg"
+        'replace_rate' como deve ser a aleatoriedade da taxa de substituição (tipicamente 10)
+        'replace_offset' valor aproximado para verificar um node especifico para substituir
+
+
+A API de mob também tem algumas variáveis programadas e funções que vai ser relembrada para cada mob
+
+    'self.gotten' isso é usado para obter leite de vacas ou lã de ovelhas
+    'self.horny' quando o animal é alimentado o suficiente, isso é definido como true e o animal pode cruzar com o mesmo tipo
+    'self.child' usado para quando animais reprodutores tem criança, usará child_texture e terá metade do tamanho
+    'self.owner' usado para definir o dono do mob NPC, tipicamente usado para cães
+    'self.order' definir "follow" (seguir) ou "stand" (parar) para que NPCs sigam o dono ou fiquem parados
+    'on_die' uma função que é chamada quando o mob é morto
+    'do_custom' uma função personalizada que é chamada enquanto o mob está ativo e tem acesso a todas as variaveis de self.* ex. (self.health para saude ou self.standing_in para status do node), retornar 'false' para pular o restante da API do mob.
+
+
+mobs:register_spawn(name, nodes, max_light, min_light, chance, active_object_count, max_height, day_toggle)
+
+mobs:spawn_specfic(name, nodes, neighbors, min_light, max_light, interval, chance, active_object_count, min_height, max_height, day_toggle)
+
+Estas funções registram um algoritmo de desova para um mob. Sem essa função a chamada do mob não vai aparecer.
+
+    'name' é o nome do animal/monstro
+    'nodes' é uma lista de nomes de nodes em que o animal/monstro pode spawnar em cima
+    'neighbors' é uma lista de nomes de nodes visinhos ao node em que o animal/monstro pode spawnar em cima (o padrão é {"air"} para mobs:register_spawn)
+    'max_light' é a iluminação máxima
+    'min_light' é a iluminação mínima
+    'interval' é o mesmo que em register_abm() (o padrão é 30 para mobs:register_spawn)
+    'chance' o mesmo que em register_abm()
+    'active_object_count' o mob spawna apenas se active_object_count_wider de ABM é <= isso
+    'min_height' é a altura máxima em que o mob pode spawnar
+    'max_height' é a altura mínima em que o mob pode spawnar
+    'day_toggle' true para spawnar durante o dia, false para durante a noite ou nil para qualquer momento
+    
+... também uma maneira mais simples de lidar com desova de mobs foi adicionado com o comando mobs:spawn(def) que usa os nomes acima para fazer ajustes mais claros:
+
+    mobs:spawn({name = "mobs_monster:tree_monster",
+       nodes = {"group:leaves"},
+       max_light = 7,
+    })
+
+Os jogadores podem sobrescrever a chance de spawn para cada mob registrado adicionando uma linha ao seu arquivo minetest.conf com um novo valor, quanto menor o valor, mais de cada mob vai spawnar. Por exemplo:
+
+mobs_animal:sheep_chance 11000 ou mobs_monster:sand_monster_chance 100
+
+Para cada mob que spawna com esta função há um campo em mobs.spawning_mobs. Isso diz se o mob deve spawnar ou não. O padrão é true. Então outros mods só pode usar a API deste mod, desativando o spawn dos mobs padrão neste mod.
+
+
+mobs:register_arrow(name, definition)
+
+Essa função registra uma flecha para mobs com o tipo de ataque shoot.
+
+    'name' é o nome da flecha
+    -definition' é uma tabela com os seguintes valores:
+        'visual' o mesmo que em minetest.register_entity()
+        'visual_size' o mesmo que em minetest.register_entity()
+        'textures' o mesmo que em minetest.register_entity()
+        'velocity' a velocidade da flecha
+        'drop' se definido como true qualquer flecha atingindo um node vai dropar como item
+        'hit_player' uma função que é chamada quando a flecha atinge um jogador; essa função deve ferir o jogador
+            os parâmetros são (self, player)
+        'hit_mob' uma função que é chamada quando a flecha atinge um mob; essa função deve ferir o mob
+            os parâmetros são (self, player)
+        'hit_node' uma função que é chamada quando a flecha atinge um node
+            os parâmetros são (self, pos, node)
+        'tail' quando definido como 1 adiciona uma trilha ou cauda para flecha do mob
+        'tail_texture' string da textura usada para o efeito acima
+        'on_step' é uma função personalizada de quando a flecha está ativa, nil para padrão
+
+
+mobs:register_egg(name, description, background, addegg)
+
+Essa função registra um ovo de spawn que pode ser usado pelo admin para spawnar corretamente um mob. 
+
+    'name' esse é o nome do seu novo mob para spawnar ex. "mob:sheep"
+    'description' o nome do novo ovo criado ex. "Spawn de Ovelha"
+    'background' a textura do ovo no inventário
+    'addegg' Você gostaria de um ovo na frente de sua textura (1=sim, 0=não)
+    'no_creative' quando definido para true isso impede o aparecimento do ovo de spawn no modo criativo para mobs destrutivos como Dungeon Masters
+
+
+mobs:explosion(pos, radius, fire, smoke)
+
+Esta função gera uma explosão que remove os nodes em um raio específico e substituí-los com fogo ou ar. Nodes protegidos, obsidiana e baús trancados não serão destruídos, no entanto um baú normal vai dropar o seu conteúdo.
+
+    'pos' posição central da explosão
+    'radius' raio de explosão (tipicamente definido para 3)
+    'fire' deve fogo aparece na explosão (1=sim, 0=não)
+    'smoke' deve aparecer fumaça na explosão (1=sim, 0=não)
+    'sound' som tocado quando o mob explode
+
+
+mobs:capture_mob(self, clicker, chance_hand, chance_net, chance_lasso, force_take, replacewith)
+
+Esta função é geralmente chamado de dentro da seção on_rightclick do código da API de mob, ele fornece uma chance de capturar o mob pela mão, usando a rede ou itens de laço mágico, e também pode o jogador ter que tomar o mob pela força, se domesticado, e substituir por outro item inteiramente.
+
+    'self' informações do mob
+    'clicker' informações do jogador
+    'chance_hand' chance de capturar o mob pela mão (1 a 100) 0 para desabilitar
+    'chance_net' chance de capturar o mob pusando rede (1 a 100) 0 para desabilitar
+    'chance_lasso' chance de capturar o mob usando o laço mágico (1 a 100) 0 para desabilitar
+    'force_take' tomar o mob pela força, mesmo se domesticado (true ou false)
+    'replacewith' uma vez capturado, substituir o mob com esse item em vez disso
+
+
+mobs:feed_tame(self, clicker, feed_count, breed)
+
+Esta função permite o mob ser alimentado com o item definido em self.follow seja maçã, trigo ou o que quiser um determinado número de vezes e ser domesticado ou procriado como resultado.
+
+    'self' informações do mob
+    'clicker' informações do jogador
+    'feed_count' número de vezes que o mob devem ser alimentado ser domesticado
+    'breed' true ou false indicando se o mob pode ser criado e uma criança criada depois
+    'tame' true ou false indicando se o mob pode ser domesticado de modo que o jogador pode pegá-los
