@@ -19,7 +19,7 @@ mobs:register_mob(name, definition)
 
 Essa função registra um novo mob em forma de entidade em Minetest
 
-    'name' is the name of the mob (e.g. "mobs:dirt_monster")
+    'name' é o nome do mob (ex. "mobs:dirt_monster")
     definition é uma tabela de definições contendo os seguintes campos
         'type' o tipo do mob ("monster", "animal" ou "npc")
         'passive' o mob deve se defender, definir false para atacar
