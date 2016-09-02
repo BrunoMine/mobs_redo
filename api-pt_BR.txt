@@ -39,10 +39,10 @@ Essa função registra um novo mob em forma de entidade em Minetest
         'mesh' o mesmo que em minetest.register_entity()
         'gotten_mesh' malha alternativa para quando o valor de self.gotten é true (usado por ovelhas)
         'makes_footstep_sound' o mesmo é em minetest.register_entity()
-        'follow' item(ns) que, quando mantido em mão, deve fazer o mob seguir o jogador, pode ser uma única string "default:apple" ou tabela de strings {"default:apple", "default:diamond"}
+        'follow' items(ns) que, quando mantido em mão, deve fazer o mob seguir o jogador, pode ser uma única string "default:apple" ou tabela de strings {"default:apple", "default:diamond"}
         'view_range' o alcance em que o monstro deve ver o jogador e persegui-lo
         'walk_chance' chances de o mob andar ao redor
-        'jump_chance' chances de o mob pular ao redor, definir acima em 0 para o mob apenas pular
+        'jump_chance' chances de o mob pular ao redor, definir 'walk_chance' em 0 para o mob apenas pular
         'walk_velocity' a velocidade em que o monstro anda ao redor
         'run_velocity' a velocidade do monstro quando estiver atacando um jogador
         'runaway' se true, o mob deve virar e fugir quando atacado
@@ -52,7 +52,7 @@ Essa função registra um novo mob em forma de entidade em Minetest
         'fly' o mob pode voar, true ou false (usado por natação do mob tambem)
         'fly_in' nome do node no qual o mob pode voar, ex. "air", "default:water_source" para peixes
         'damage' o dano por segundo
-        'recovery_time' quanto tempo, desde que o mob é golpeado, para recuperar (o padrão é 0.5)
+        'recovery_time' quanto tempo, desde que o mob é golpeado, para voltar ao normal (o padrão é 0.5 segundos)
         'knock_back' força do knock-back quando o mob é golpeado (o padrão é 3)
         'immune_to' tabela contendo nomes dos itens/ferramentas especiais e dano causado
             ex. {"default:sword_wood", 0}, {"default:gold_lump", -10} imune a espada de madeira, minerio de ouro cura
@@ -69,7 +69,7 @@ Essa função registra um novo mob em forma de entidade em Minetest
         'water_damage' dano por segundo se o mob estiver na água
         'lava_damage' dano por segundo se o mob estiver na lava
         'light_damage' dano por segundo se o mob estiver na luz
-        'fall_damage' mob deve receber dano quando cair de altura
+        'fall_damage' mob deve receber dano quando cair de altura (1=ativado, 0=desativado)
         'fall_speed' velocidade da queda do mob (o padrão é -10 e tem que ser menor que -2)
         'fear_height' distancia do mob e uma queda para então, acima de tudo, ele voltar (o padrão é 0 para desabilitar)
         'on_die' uma função que é chamado quando o mob morre, os parâmetros são (self, pos)
@@ -89,7 +89,7 @@ Essa função registra um novo mob em forma de entidade em Minetest
         'explosion_radius' raio de ataque da explosão (o padrão é 1)
         'arrow' se attack_type (tipo de ataque) for "shoot" ou "dogshoot" então o nome da entidade da flecha é requerido
         'shoot_interval' o intervalo mínimo entre os tiros
-        'shoot_offset' valor aproximado da flecha/bola de fogo quando disparado
+        'shoot_offset' valor aproximado da altura da flecha/bola de fogo quando disparado (ex. 0 para atirar do pé)
         'reach' quão longe o alcance do mob, o padrão é 3
         'sounds' essa é uma tabela com os sons do mob
             'random' som aleatorio durante o jogo
@@ -149,7 +149,7 @@ Estas funções registram um algoritmo de desova para um mob. Sem essa função 
     'min_light' é a iluminação mínima
     'interval' é o mesmo que em register_abm() (o padrão é 30 para mobs:register_spawn)
     'chance' o mesmo que em register_abm()
-    'active_object_count' o mob spawna apenas se active_object_count_wider de ABM é <= isso
+    'active_object_count' é uma limite de mobs ativos em cada area carregada por ABM
     'min_height' é a altura máxima em que o mob pode spawnar
     'max_height' é a altura mínima em que o mob pode spawnar
     'day_toggle' true para spawnar durante o dia, false para durante a noite ou nil para qualquer momento
@@ -178,7 +178,7 @@ Essa função registra uma flecha para mobs com o tipo de ataque shoot.
         'visual_size' o mesmo que em minetest.register_entity()
         'textures' o mesmo que em minetest.register_entity()
         'velocity' a velocidade da flecha
-        'drop' se definido como true qualquer flecha atingindo um node vai dropar como item
+        'drop' se definido como true qualquer flecha que atingir um node vai dropar como um item
         'hit_player' uma função que é chamada quando a flecha atinge um jogador; essa função deve ferir o jogador
             os parâmetros são (self, player)
         'hit_mob' uma função que é chamada quando a flecha atinge um mob; essa função deve ferir o mob
