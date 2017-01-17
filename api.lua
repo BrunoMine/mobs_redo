@@ -208,6 +208,71 @@ set_animation = function(self, type)
 	end
 end
 
+-- Get distance
+local get_distance = function(a, b)
+
+	local x, y, z = a.x - b.x, a.y - b.y, a.z - b.z
+
+	return math.sqrt(x * x + y * y + z * z)
+end
+
+-- check line of sight
+function line_of_sight(self, pos1, pos2, stepsize)
+	
+	if not stepsize then stepsize = 1 end
+	
+	local s, pos = minetest.line_of_sight(pos1, pos2, stepsize)
+
+	-- normal walking and flying mobs can see you through air
+	if s == true then
+		return true
+	end
+	
+	-- New pos1 to be analyzed
+	local npos1 = {x=pos1.x, y=pos1.y, z=pos1.z}
+	
+	local r, pos = minetest.line_of_sight(npos1, pos2, stepsize)
+	
+	-- Checks the return
+	if r == true then return true end
+	
+	-- Nodename found
+	local nn = minetest.get_node(pos).name
+	
+	-- Target Distance (td) to travel
+	local td = get_distance(pos1, pos2)
+	
+	-- Actual Distance (ad) traveled
+	local ad = 0
+	
+	-- It continues to advance in the line of sight in search of a real obstruction.
+	while minetest.registered_nodes[nn].walkable == false do
+	
+		-- Check if you can still move forward
+		if td < ad + stepsize then
+			return true -- Reached the target
+		end
+		
+		-- Moves the analyzed pos
+		local d = get_distance(pos1, pos2)
+		npos1.x = ((pos2.x - pos1.x)/d * stepsize) + pos1.x
+		npos1.y = ((pos2.y - pos1.y)/d * stepsize) + pos1.y
+		npos1.z = ((pos2.z - pos1.z)/d * stepsize) + pos1.z
+		
+		ad = ad + stepsize
+		
+		-- scan again
+		r, pos = minetest.line_of_sight(npos1, pos2, stepsize)
+		
+		if r == true then return true end
+		
+		-- New Nodename found
+		nn = minetest.get_node(pos).name
+		
+	end
+	
+	return false
+end
 
 -- check line of sight for walkers and swimmers alike
 function line_of_sight_water(self, pos1, pos2, stepsize)
@@ -1692,7 +1757,7 @@ local do_states = function(self, dtime)
 						p2.y = p2.y + .5--1.5
 						s2.y = s2.y + .5--1.5
 
-						if line_of_sight_water(self, p2, s2) == true then
+						if line_of_sight(self, p2, s2) == true then
 
 							-- play attack sound
 							mob_sound(self, self.sounds.attack)
